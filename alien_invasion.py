@@ -37,6 +37,7 @@ class AlienInvasion:
             self._check_events()
             self.ship.update()
             self._update_bullets()
+            self._update_alien()
             # При каждом проходе цикла перерисовывается экран.
             self._update_screen()
 
@@ -86,6 +87,11 @@ class AlienInvasion:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+    def _update_alien(self):
+        """Обновление позиции всех пришельцев во флоте."""
+        self._check_fleet_edges()
+        self.aliens.update()
+
     def _create_fleet(self):
         """Создает флот пришельцев."""
         # Создание пришельца и добавление других, пока остается место.
@@ -111,6 +117,19 @@ class AlienInvasion:
         new_alien.rect.x = x_position
         new_alien.rect.y = y_position
         self.aliens.add(new_alien)
+
+    def _check_fleet_edges(self):
+        """Реагирует на достижение пришельцем края экрана."""
+        for alien in self.aliens.sprites():
+            if alien.check_edges():
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self):
+        """Опускает весь флот и меняет его направление."""
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
 
     def _update_screen(self):
         """Обновляет изображения на экране и отображает новый экран."""
