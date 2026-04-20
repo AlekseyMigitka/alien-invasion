@@ -12,7 +12,7 @@ class Ship:
 
         # Загружает изображение корабля и получает прямоугольник.
         self.image = pygame.image.load(
-            '/Users/aleksey/Downloads/DurrrSpaceShip.png'
+            'images/DurrrSpaceShip.png'
         )
         self.rect = self.image.get_rect()
 
