@@ -5,6 +5,7 @@ import pygame
 
 from settings import Settings
 from game_stats import GameStats
+from button import Button
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -36,7 +37,10 @@ class AlienInvasion:
         self.bg_color = (230, 230, 230)
 
         # Игра запускается в активном состоянии.
-        self.game_active = True
+        self.game_active = False
+
+        # Создание кнопки Play.
+        self.play_button = Button(self, "Play")
 
     def run_game(self):
         """Запускает основной цикл игры."""
@@ -62,6 +66,28 @@ class AlienInvasion:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
+
+    def _check_play_button(self, mouse_pos):
+        """Запускает новую игру при нажатии кнопки Play."""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.game_active:
+            # Сброс игровой статистики.
+            self.stats.reset_stats()
+            self.game_active = True
+
+            # Очистка групп alien и bullets.
+            self.bullets.empty()
+            self.aliens.empty()
+
+            # Создание нового флота и размещение корабля в центре.
+            self._create_fleet()
+            self.ship.center_ship()
+
+            # Указатель мыши скрывается.
+            pygame.mouse.set_visible(False)
 
     def _check_keydown_events(self, event):
         """Реагирует на нажатие клавиш."""
@@ -137,6 +163,7 @@ class AlienInvasion:
             self.ship.center_ship()
         else:
             self.game_active = False
+            pygame.mouse.set_visible(True)
 
         # Пауза.
         sleep(0.5)
@@ -187,6 +214,10 @@ class AlienInvasion:
             bullet.draw_bullet()
         self.ship.blitme()
         self.aliens.draw(self.screen)
+
+        # Кнопка Play отображается в том случае, если игра не активна.
+        if not self.game_active:
+            self.play_button.draw_button()
 
         # Отображение последнего прорисованного экрана.
         pygame.display.flip()
